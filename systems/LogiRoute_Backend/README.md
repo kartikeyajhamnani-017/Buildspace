@@ -24,7 +24,7 @@ Automated Invoicing Engine: Automated billing computations mapping dimensions, w
 Secure Authentication: JWT-based authentication layered with Role-Based Access Control (RBAC) middleware separating Dispatchers, Drivers, and Client accounts.
 
 📦 Project Structure
-
+``` Bash
 ├── cmd/
 │   └── api/
 │       └── main.go          # Application entrypoint
@@ -39,6 +39,8 @@ Secure Authentication: JWT-based authentication layered with Role-Based Access C
 ├── docker-compose.yaml      # Multi-container setup orchestrator (App + MongoDB)
 ├── go.mod
 └── README.md
+```
+
 ⚙️ Quick Start
 Prerequisites
 Docker and Docker Compose installed locally.
