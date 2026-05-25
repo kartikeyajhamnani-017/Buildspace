@@ -1,0 +1,7 @@
+
+
+# Ignore all python pickle model and scaler files anywhere in the repository
+*.pkl
+
+# Explicitly ignore anything inside the intelligence-layer models folder
+intelligence-layer/models/
