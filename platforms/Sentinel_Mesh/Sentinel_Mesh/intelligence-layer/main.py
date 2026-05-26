@@ -25,9 +25,9 @@ class SentinelMLEngine:
         # Layer 2 — one detector per protocol
         self.ml_detectors = {}
         for protocol, filename in [
-            ('HTTP', 'sentinel_model_http.pkl'),
-            ('SSH',  'sentinel_model_ssh.pkl'),
-            ('DNS',  'sentinel_model_dns.pkl'),
+            ('HTTP', 'http_model.pkl'),
+            ('SSH',  'ssh_model.pkl'),
+            ('DNS',  'dns_model.pkl'),
         ]:
             try:
                 detector = MLAnomalyDetector(protocol=protocol)

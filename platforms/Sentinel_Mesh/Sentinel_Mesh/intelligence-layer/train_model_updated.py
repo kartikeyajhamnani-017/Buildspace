@@ -373,19 +373,29 @@ def generate_ssh_training_data():
         "SSH-2.0-" + "\xff" * 32,
         "\x00\x00\x00\x04\xff\xff\xff\xff" + "SSH-2.0-scan",
     ]
+##
 
+
+    ext_benign, ext_malicious = _load_external('ssh')
+
+    # Cowrie direct file — append to ext_malicious
     cowrie_file = '/content/sentinel/datasets/ssh/malicious/cowrie.txt'
     if os.path.exists(cowrie_file):
         try:
             with open(cowrie_file, 'r', errors='replace') as f:
-                ext_malicious = [line.strip() for line in f if line.strip()]
-            # Add up to 5000 real world attack sequences to keep training balanced
-            malicious.extend(ext_malicious[:5000])
-            print(f"  -> Successfully injected {len(ext_malicious[:5000])} real Cowrie SSH records.")
+                cowrie_data = [line.strip() for line in f if line.strip()]
+            ext_malicious = ext_malicious + cowrie_data[:5000]
+            print(f"  -> Injected {len(cowrie_data[:5000])} Cowrie SSH records.")
         except Exception as e:
             print(f"  [WARN] Failed to read cowrie log data: {e}")
 
-    ext_benign, ext_malicious = _load_external('ssh')
+
+
+
+
+
+
+
 
     malicious = (
         brute_force + downgrade_attacks + exploit_strings + shellcode +
@@ -504,19 +514,34 @@ def generate_dns_training_data():
         "TXT beacon_id_9f8e7d6c5b4a3928 c2_response_ok z1x2c3v4",
     ]
 
+
+##
+    ext_benign, ext_malicious = _load_external('dns')
+
+    # Alexa benign
     alexa_file = '/content/sentinel/datasets/dns/benign/alexa_top500.txt'
     if os.path.exists(alexa_file):
-        with open(alexa_file, 'r') as f:
-            benign.extend([line.strip() for line in f if line.strip()])
+        try:
+            with open(alexa_file, 'r') as f:
+                alexa_data = [line.strip() for line in f if line.strip()]
+            ext_benign = ext_benign + alexa_data
+        except Exception as e:
+            print(f"  [WARN] Alexa file error: {e}")
 
-    # Load real malicious data from Bambenek DGA file
+    # Bambenek DGA malicious
     bambenek_file = '/content/sentinel/datasets/dns/malicious/bambenek_dga.txt'
     if os.path.exists(bambenek_file):
-        with open(bambenek_file, 'r') as f:
-            malicious.extend([line.strip() for line in f if line.strip()][:2000])
+        try:
+            with open(bambenek_file, 'r') as f:
+                bambenek_data = [line.strip() for line in f if line.strip()]
+            ext_malicious = ext_malicious + bambenek_data[:2000]
+        except Exception as e:
+            print(f"  [WARN] Bambenek file error: {e}")
 
 
-    ext_benign, ext_malicious = _load_external('dns')
+
+
+
 
     malicious = (
         tunneling + dga_domains + amplification + txt_exfil +
@@ -588,16 +613,15 @@ def train_protocol(protocol, payloads, labels):
     detector.train(payloads, labels=labels)
     
     # Save files matching expected names in your final cells
-    detector.save_model(filename=f"/content/sentinel/models/{protocol.lower()}_model.pkl")
+    detector.save_model(filename=f"{protocol.lower()}_model.pkl")
     print(f"  [OK] {protocol} model saved successfully.")
 
-    # Execute evaluation safely
-    try:
-        metrics = detector.evaluate(payloads, labels)
-    except AttributeError:
-        metrics = {"status": "trained"}
+    metrics = detector.evaluate(payloads, labels)
+
+    from model import save_metrics as _save_metrics
+    _save_metrics(protocol, metrics)
     
-    save_metrics(protocol, metrics)
+    
     return detector
 
 

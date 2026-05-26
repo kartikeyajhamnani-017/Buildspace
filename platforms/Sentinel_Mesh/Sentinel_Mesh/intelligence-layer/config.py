@@ -165,14 +165,14 @@ MODEL_DIR = os.path.join(_PROJECT_ROOT, 'models')
 METRICS_DIR = os.path.join(_PROJECT_ROOT, 'metrics')
 
 MODEL_PATHS = {
-    'HTTP': os.path.join(MODEL_DIR, 'sentinel_model_http.pkl'),
-    'SSH':  os.path.join(MODEL_DIR, 'sentinel_model_ssh.pkl'),
-    'DNS':  os.path.join(MODEL_DIR, 'sentinel_model_dns.pkl'),
+    'HTTP': os.path.join(MODEL_DIR, 'http_model.pkl'),
+    'SSH':  os.path.join(MODEL_DIR, 'ssh_model.pkl'),
+    'DNS':  os.path.join(MODEL_DIR, 'dns_model.pkl'),
 }
 SCALER_PATHS = {
-    'HTTP': os.path.join(MODEL_DIR, 'sentinel_model_http_scaler.pkl'),
-    'SSH':  os.path.join(MODEL_DIR, 'sentinel_model_ssh_scaler.pkl'),
-    'DNS':  os.path.join(MODEL_DIR, 'sentinel_model_dns_scaler.pkl'),
+    'HTTP': os.path.join(MODEL_DIR, 'http_model_scaler.pkl'),
+    'SSH':  os.path.join(MODEL_DIR, 'ssh_model_scaler.pkl'),
+    'DNS':  os.path.join(MODEL_DIR, 'dns_model_scaler.pkl'),
 }
 
 # Legacy single-model paths (kept for backwards compatibility)

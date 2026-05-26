@@ -5,3 +5,8 @@
 
 # Explicitly ignore anything inside the intelligence-layer models folder
 intelligence-layer/models/
+intelligence-layer/__pycache__/
+
+
+# Ignore the local virtual environment folder
+.venv/
