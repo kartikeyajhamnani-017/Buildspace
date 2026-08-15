@@ -1,0 +1,8 @@
+nexus-microservices-mvp/
+├── api-gateway/              # Spring Cloud Gateway (Port 8080)
+├── order-service/            # PostgreSQL & Producer (Port 8081)
+├── product-service/          # MongoDB (Port 8082)
+├── inventory-service/        # RabbitMQ Consumer (Port 8083)
+├── docker-compose.yml        # Orchestrates the whole system
+├── .gitignore                # Global git ignore
+└── README.md                 # Documentation
