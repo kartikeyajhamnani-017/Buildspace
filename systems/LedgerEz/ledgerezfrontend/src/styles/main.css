@@ -1,0 +1,121 @@
+body {
+  font-family: "Segoe UI", sans-serif;
+  background: #f4f6f9;
+  margin: 0;
+}
+
+.auth-container, .dashboard {
+  max-width: 400px;
+  margin: 80px auto;
+  padding: 30px;
+  background: white;
+  border-radius: 10px;
+  box-shadow: 0 4px 20px rgba(0,0,0,0.1);
+}
+
+input {
+  width: 100%;
+  margin: 10px 0;
+  padding: 10px;
+  border-radius: 6px;
+  border: 1px solid #ccc;
+}
+
+button {
+  width: 100%;
+  padding: 10px;
+  background: #2563eb;
+  color: white;
+  border: none;
+  border-radius: 6px;
+  cursor: pointer;
+}
+
+button:hover {
+  background: #1d4ed8;
+}
+
+.tx-card {
+  padding: 10px;
+  border-bottom: 1px solid #eee;
+}
+
+.app-container {
+  display: flex;
+  height: 100vh;
+}
+
+.sidebar {
+  width: 230px;
+  background: #111827;
+  color: white;
+  padding: 20px;
+  display: flex;
+  flex-direction: column;
+}
+
+.logo {
+  margin-bottom: 30px;
+}
+
+.nav-item {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  padding: 12px;
+  color: #9ca3af;
+  text-decoration: none;
+  border-radius: 6px;
+  margin-bottom: 8px;
+}
+
+.nav-item.active,
+.nav-item:hover {
+  background: #1f2937;
+  color: white;
+}
+
+.main-section {
+  flex: 1;
+  background: #f9fafb;
+}
+.topbar {
+  display: flex;
+  align-items: center;
+  padding: 20px;
+  background: white;
+  border-bottom: 1px solid #eee;
+}
+
+/* Welcome text takes available space */
+.topbar h1 {
+  margin: 0;
+  flex: 1;
+}
+
+/* Logout button stays small */
+.topbar button {
+  width: auto;          /* 👈 overrides any 100% width */
+  flex: 0;              /* 👈 prevents stretching */
+  padding: 8px 16px;
+  border-radius: 8px;
+  border: none;
+  background: #2f5fd0;
+  color: white;
+  cursor: pointer;
+}
+.content {
+  padding: 30px;
+}
+
+.card {
+  background: white;
+  padding: 20px;
+  border-radius: 10px;
+  box-shadow: 0 4px 15px rgba(0,0,0,0.05);
+  margin-bottom: 20px;
+}
+
+.small {
+  padding: 10px;
+}

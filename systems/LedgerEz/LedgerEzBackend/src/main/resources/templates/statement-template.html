@@ -1,0 +1,74 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8" />
+    <title>LedgerEz Account Statement</title>
+    <style>
+        body {  color: #333; }
+        .container { width: 90%; margin: 0 auto; }
+        .header { text-align: center; border-bottom: 2px solid #eee; padding-bottom: 10px; }
+        .header h1 { margin: 0; }
+        .summary { background-color: #f9f9f9; padding: 20px; margin-top: 20px; border-radius: 5px; }
+        .summary p { margin: 5px 0; font-size: 1.1em; }
+        .summary span { font-weight: bold; }
+        table { width: 100%; border-collapse: collapse; margin-top: 20px; }
+        th, td { border: 1px solid #ddd; padding: 8px; text-align: left; }
+        th { background-color: #f2f2f2; }
+        .tx-in { color: green; }
+        .tx-out { color: red; }
+    </style>
+</head>
+<body>
+<div class="container">
+    <div class="header">
+        <h1>LedgerEz</h1>
+        <p>Account Statement</p>
+    </div>
+
+    <div class="summary">
+        <p>Statement for: <span th:text="${user.firstName} + ' (' + ${user.email} + ')'">User Name (email)</span></p>
+        <p>Generated on: <span th:text="${#temporals.format(statementDate, 'dd-MMM-yyyy HH:mm')}">Date</span></p>
+        <p>Current Balance: <span th:text="${'₹' + #numbers.formatDecimal(balance.balance, 1, 'COMMA', 2, 'POINT')}">₹0.00</span></p>
+    </div>
+
+    <h3>Transaction History</h3>
+    <table>
+        <thead>
+        <tr>
+            <th>Date</th>
+            <th>Description</th>
+            <th>From</th>
+            <th>To</th>
+            <th>Amount</th>
+        </tr>
+        </thead>
+        <tbody>
+        <tr th:each="tx : ${transactions}">
+            <td th:text="${#temporals.format(tx.timestamp, 'dd-MM-yy HH:mm')}">Date</td>
+            <td th:text="${tx.description}">For lunch</td>
+            <td th:text="${tx.fromUserEmail}">from@email.com</td>
+            <td th:text="${tx.toUserEmail}">to@email.com</td>
+
+            <!--/* --- THIS IS THE FIX ---
+              We must use .equals() to compare Strings, not ==
+            */-->
+            <td th:if="${tx.toUserEmail.equals(user.email)}"
+                class="tx-in"
+                th:text="'+ ₹' + ${#numbers.formatDecimal(tx.amount, 1, 2)}">
+                + ₹100.00
+            </td>
+            <td th:if="${tx.fromUserEmail.equals(user.email)}"
+                class="tx-out"
+                th:text="'- ₹' + ${#numbers.formatDecimal(tx.amount, 1, 2)}">
+                - ₹100.00
+            </td>
+        </tr>
+        <tr th:if="${#lists.isEmpty(transactions)}">
+            <td colspan="5" style="text-align: center;">No transactions found.</td>
+        </tr>
+        </tbody>
+    </table>
+
+</div>
+</body>
+</html>
