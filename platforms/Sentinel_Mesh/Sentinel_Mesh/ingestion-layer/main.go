@@ -76,7 +76,7 @@ func main() {
 
 	http.HandleFunc("/ingest", handleLogIngestion)
 
-	port := ":8080"
+	port := ":9000"
 	fmt.Println("🛡️ Sentinel Shield Active (with Redis Buffer). Listening on port " + port)
 	if err := http.ListenAndServe(port, nil); err != nil {
 		log.Fatal(err)

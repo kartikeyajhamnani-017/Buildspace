@@ -1,0 +1,45 @@
+server:
+  port: 8090
+
+
+spring:
+  application:
+    name: Sentinel_RBAC
+
+
+  # ===================================================================
+  # DATABASE CONFIGURATION
+  # All secrets are read from environment variables (see db.env / db.env.example).
+  # Nothing sensitive is hardcoded here so this file is safe to commit.
+  # ===================================================================
+  datasource:
+    url: ${DB_URL:jdbc:postgresql://localhost:5432/Sentinel_DB}
+    username: ${DB_USER:postgres}
+    password: ${DB_PASSWORD}
+    driver-class-name: org.postgresql.Driver
+
+  # ===================================================================
+  # JPA / HIBERNATE CONFIGURATION
+  # ===================================================================
+  jpa:
+    hibernate:
+      ddl-auto: update
+    show-sql: false
+    properties:
+      hibernate:
+        dialect: org.hibernate.dialect.PostgreSQLDialect
+
+  # ===================================================================
+  # THYMELEAF TEMPLATE CONFIGURATION
+  # ===================================================================
+  thymeleaf:
+    cache: false
+    mode: HTML
+
+# ===================================================================
+# LOGGING CONFIGURATION
+# ===================================================================
+logging:
+  level:
+    org.springframework.security: INFO
+    org.hibernate.SQL: ERROR

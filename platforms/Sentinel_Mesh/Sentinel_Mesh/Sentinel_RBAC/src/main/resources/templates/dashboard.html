@@ -1,0 +1,196 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org" xmlns:sec="http://www.thymeleaf.org/extras/spring-security">
+<head>
+    <title>Security Pipeline Dashboard</title>
+    <style>
+        * { box-sizing: border-box; }
+        body {
+            font-family: -apple-system, Segoe UI, Roboto, sans-serif;
+            margin: 0;
+            background: #f4f6f8;
+            color: #1c2530;
+        }
+        .page-container { max-width: 1200px; margin: 0 auto; padding: 20px 24px 48px; }
+
+        header {
+            display: flex;
+            align-items: center;
+            justify-content: flex-end;
+            gap: 16px;
+            padding: 12px 24px;
+            background: #1c2530;
+            color: #f4f6f8;
+            font-size: 0.9em;
+        }
+        header strong { color: #fff; }
+        header button {
+            background: transparent;
+            color: #f4f6f8;
+            border: 1px solid #4a5768;
+            border-radius: 4px;
+            padding: 5px 12px;
+            cursor: pointer;
+        }
+        header button:hover { background: #2c394a; }
+
+        h1 { font-size: 1.5em; margin: 24px 0 16px; }
+        h2 { font-size: 1.2em; margin: 32px 0 12px; }
+
+        .metrics-cards { display: flex; gap: 12px; flex-wrap: wrap; margin-bottom: 8px; }
+        .metrics-card {
+            background: #fff;
+            border: 1px solid #e0e4e9;
+            border-radius: 8px;
+            padding: 14px 18px;
+            min-width: 140px;
+            flex: 1 1 140px;
+            box-shadow: 0 1px 2px rgba(0,0,0,0.04);
+        }
+        .metrics-card h3 { margin: 0 0 4px; font-size: 1.6em; }
+        .metrics-card span { color: #5b6675; font-size: 0.85em; }
+
+        .panel { border-radius: 8px; padding: 14px 18px; margin-bottom: 20px; background: #fff; border: 1px solid #e0e4e9; border-left: 4px solid; }
+        .panel h3 { margin: 0 0 10px; }
+        .panel-admin { border-left-color: #c0392b; }
+        .panel-hunter { border-left-color: #7d3c98; }
+        .panel button {
+            background: #1c2530;
+            color: #fff;
+            border: none;
+            border-radius: 4px;
+            padding: 6px 14px;
+            margin-right: 8px;
+            cursor: pointer;
+        }
+        .panel button:hover { background: #2c394a; }
+
+        .badge { display: inline-block; padding: 2px 8px; border-radius: 10px; font-size: 0.8em; font-weight: bold; color: #fff; }
+        .badge-critical { background: #c0392b; }
+        .badge-high { background: #d68910; }
+        .badge-direct { background: #2471a3; }
+        .badge-fullscan { background: #7d3c98; }
+        .mitre-chip { display: inline-block; background: #eee; border: 1px solid #ccc; border-radius: 4px; padding: 1px 6px; margin: 1px; font-family: monospace; font-size: 0.8em; }
+        .conf-bar-track { width: 80px; height: 6px; background: #eee; border-radius: 3px; display: inline-block; vertical-align: middle; }
+        .conf-bar-fill { height: 6px; background: #2471a3; border-radius: 3px; }
+        .payload-cell { font-family: monospace; font-size: 0.85em; max-width: 260px; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+
+        .threats-table { width: 100%; border-collapse: collapse; background: #fff; border: 1px solid #e0e4e9; border-radius: 8px; overflow: hidden; }
+        .threats-table th, .threats-table td { padding: 8px 12px; text-align: left; font-size: 0.9em; border-bottom: 1px solid #eef0f3; }
+        .threats-table th { background: #eef1f5; color: #4a5768; font-size: 0.8em; text-transform: uppercase; letter-spacing: 0.03em; }
+        .threats-table tbody tr:hover { background: #f7f9fb; }
+        .threats-table tbody tr:nth-child(even) { background: #fafbfc; }
+
+        .pagination { display: flex; align-items: center; gap: 16px; margin-top: 16px; font-size: 0.9em; color: #5b6675; }
+        .pagination a {
+            color: #2471a3;
+            text-decoration: none;
+            border: 1px solid #d5dbe2;
+            border-radius: 4px;
+            padding: 4px 12px;
+            background: #fff;
+        }
+        .pagination a:hover { background: #eef1f5; }
+    </style>
+</head>
+<body>
+
+<header>
+    <span>Logged in as: <strong sec:authentication="name"></strong></span>
+    <span>Role: <strong sec:authentication="principal.authorities"></strong></span>
+    <form th:action="@{/logout}" method="post" style="display:inline;">
+        <button type="submit">Logout</button>
+    </form>
+</header>
+
+<div class="page-container">
+
+<h1>Security Overview</h1>
+
+<div th:if="${metrics != null}" class="metrics-cards">
+    <div class="metrics-card"><h3 th:text="${metrics.totalProcessed}">0</h3><span>Total Processed</span></div>
+    <div class="metrics-card"><h3 th:text="${metrics.totalThreats}">0</h3><span>Total Threats</span></div>
+    <div class="metrics-card"><h3 th:text="${metrics.layer1Hits}">0</h3><span>Layer 1 (Rules) Hits</span></div>
+    <div class="metrics-card"><h3 th:text="${metrics.layer2Hits}">0</h3><span>Layer 2 (ML) Hits</span></div>
+    <div class="metrics-card"><h3 th:text="${metrics.layer3Hits}">0</h3><span>Layer 3 (Sequence) Hits</span></div>
+    <div class="metrics-card"><h3 th:text="${metrics.routingDisagreements}">0</h3><span>Routing Disagreements</span></div>
+    <div class="metrics-card">
+        <h3 th:if="${metrics.lastProcessedAt != null}" th:text="${#temporals.format(metrics.lastProcessedAt, 'yyyy-MM-dd HH:mm')}">-</h3>
+        <h3 th:if="${metrics.lastProcessedAt == null}">-</h3>
+        <span>Last Processed</span>
+    </div>
+</div>
+<div th:if="${metrics == null}" class="metrics-card">
+    <span>No pipeline metrics available yet.</span>
+</div>
+
+<div sec:authorize="hasRole('ADMIN')" class="panel panel-admin">
+    <h3>Admin Controls</h3>
+    <button>Purge Old Logs</button>
+    <button>Manage Users</button>
+</div>
+
+<div sec:authorize="hasAnyRole('ADMIN', 'THREAT_HUNTER')" class="panel panel-hunter">
+    <h3>Advanced Threat Hunting</h3>
+    <button>Run Custom YARA Rule</button>
+</div>
+
+<h2>Recent Threats</h2>
+<table class="threats-table">
+    <thead>
+    <tr>
+        <th>Processed At</th>
+        <th>Source IP</th>
+        <th>Protocol</th>
+        <th>Confidence</th>
+        <th>Threat Level</th>
+        <th>Detection Layer</th>
+        <th>Attack Type</th>
+        <th>Detected As</th>
+        <th>Routing</th>
+        <th>MITRE ATT&amp;CK</th>
+        <th sec:authorize="hasRole('ADMIN')">Payload</th>
+    </tr>
+    </thead>
+    <tbody>
+    <tr th:each="threat : ${threats}">
+        <td th:text="${#temporals.format(threat.processedAt, 'yyyy-MM-dd HH:mm')}"></td>
+        <td th:text="${threat.sourceIp}"></td>
+        <td th:text="${threat.requestType}"></td>
+        <td>
+            <span class="conf-bar-track"><span class="conf-bar-fill" th:style="'width:' + ${#numbers.formatDecimal(threat.confidence * 100, 1, 0)} + '%'"></span></span>
+            <span th:text="${#numbers.formatDecimal(threat.confidence * 100, 1, 1)} + '%'"></span>
+        </td>
+        <td>
+            <span class="badge" th:classappend="${threat.threatLevel == 'CRITICAL'} ? 'badge-critical' : 'badge-high'" th:text="${threat.threatLevel}"></span>
+        </td>
+        <td th:text="${threat.detectionLayer}"></td>
+        <td th:text="${threat.attackType}"></td>
+        <td th:text="${threat.detectedAs} ?: '—'"></td>
+        <td>
+            <span th:if="${threat.routing != null}" class="badge" th:classappend="${threat.routing == 'direct'} ? 'badge-direct' : 'badge-fullscan'" th:text="${threat.routing}"></span>
+            <span th:if="${threat.routing == null}">—</span>
+        </td>
+        <td>
+            <span th:if="${threat.mitreAttack == null or #strings.isEmpty(threat.mitreAttack)}">—</span>
+            <span th:unless="${threat.mitreAttack == null or #strings.isEmpty(threat.mitreAttack)}"
+                  th:each="technique : ${#strings.arraySplit(threat.mitreAttack, ',')}"
+                  class="mitre-chip" th:text="${#strings.trim(technique)}"></span>
+        </td>
+        <td sec:authorize="hasRole('ADMIN')" class="payload-cell" th:text="${threat.payload}" th:title="${threat.payload}"></td>
+    </tr>
+    <tr th:if="${#lists.isEmpty(threats)}">
+        <td colspan="100%">No threats recorded.</td>
+    </tr>
+    </tbody>
+</table>
+
+<div class="pagination" th:if="${totalPages > 1}">
+    <span>Page <span th:text="${currentPage + 1}"></span> of <span th:text="${totalPages}"></span>
+        (<span th:text="${totalElements}"></span> total)</span>
+    <a th:if="${currentPage > 0}" th:href="@{/dashboard(page=${currentPage - 1})}">Previous</a>
+    <a th:if="${currentPage + 1 < totalPages}" th:href="@{/dashboard(page=${currentPage + 1})}">Next</a>
+</div>
+
+</div>
+</body>
+</html>

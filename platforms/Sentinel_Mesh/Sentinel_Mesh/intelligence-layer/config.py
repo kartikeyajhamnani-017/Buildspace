@@ -22,9 +22,25 @@ SEQUENCE_WINDOW_SIZE = 10  # Track last 10 payloads per IP
 SEQUENCE_TIMEOUT = 3600  # Forget IP after 1 hour of inactivity
 
 # Detection Thresholds
-ANOMALY_SCORE_THRESHOLD = 0.6  # 0-1, higher = stricter
+# Per-protocol anomaly thresholds. SSH and DNS get a slightly stricter
+# threshold because their feature spaces are narrower — a payload that
+# leaked through from the wrong protocol is more likely to produce a
+# borderline score there than in the richer HTTP feature space.
+ANOMALY_SCORE_THRESHOLD = {
+    'HTTP': 0.60,
+    'SSH':  0.65,
+    'DNS':  0.65,
+}
 RULE_BASED_CONFIDENCE = 1.0  # Rules give 100% confidence
 ML_ANOMALY_CONFIDENCE = 0.8  # ML anomalies get 80% confidence
+
+# Hybrid Protocol Routing (see protocol_fingerprint.py)
+# Minimum confidence the structural fingerprinter needs before it is
+# allowed to contradict the ingestor's protocol hint. Below this,
+# the payload is too ambiguous to second-guess the hint, so it is
+# trusted and routed directly — avoiding unnecessary full multi-model
+# scans on short or structurally neutral payloads.
+FINGERPRINT_MIN_CONFIDENCE = 0.55
 
 # Known Bad Patterns (Rule-Based Filter)
 BLACKLIST_KEYWORDS = [
